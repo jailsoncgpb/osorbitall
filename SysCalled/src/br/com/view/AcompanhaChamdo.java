@@ -29,6 +29,7 @@ public class AcompanhaChamdo extends JFrame {
 	  PreparedStatement pst = null;
 	  ResultSet rs =null;
 	  
+	  
 
 	/**
 	 * Create the frame.
@@ -84,15 +85,16 @@ public class AcompanhaChamdo extends JFrame {
 
 	public void geraTabela() {
 		
+		String sql = "select Setor_Chamado,Posicao_Pa_chamado,Hora_Chamado,Status_Chamdo,Solicitante_Chamado from tbchamados where Status_Chamdo = 'ABERTO'" ;
+		
+	try {
+			
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); //mantem o tamanho das colunas  
 		//table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); desabilita a seleção multipla  
 		table.setModel(new DefaultTableModel( 
 				
 	            new Object [][]{},  
-	            new String[] {"Código", "Nome", "Endereço",  
-	            "Cidade", "Bairro", "Telefone", "Celular", "E-mail",  
-	            "RG", "CPF", "Nascimento", "Sexo"}  
-	    ));  
+	            new String[] {"Setor Chamado","Posicao Pa","Hora Chamado","Status Chamdo","Solicitante Chamado" }));  
 	  
 		table.getColumnModel().getColumn(0).setPreferredWidth(80);  
 		table.getColumnModel().getColumn(1).setPreferredWidth(270);  
@@ -104,26 +106,21 @@ public class AcompanhaChamdo extends JFrame {
 		table.getColumnModel().getColumn(7).setPreferredWidth(300);		  
 		table.getColumnModel().getColumn(9).setPreferredWidth(90);  
 		table.getColumnModel().getColumn(10).setPreferredWidth(75);  
-		table.getColumnModel().getColumn(11).setPreferredWidth(40);  
-	  
-	    ConectaPGSQL.retorna_obj_ConectaPGSQL().execSQL("select Setor_Chamado,Posicao_Pa_chamado,Hora_Chamado,Status_Chamdo,Solicitante_Chamado from tbchamados where Status_Chamdo = 'ABERTO'");  
-	    enche_tabela();  
-	  
-//------------------------------------------------------------------------------------------	  
-	private void enche_tabela() {  
-	    
-		DefaultTableModel modelo = (DefaultTableModel)table.getModel();  
-	    modelo.setNumRows(0);  
-	  
-	    try {  
-	    
-	    	while(ConectaPGSQL.retorna_obj_ConectaPGSQL().resultsql.next()) {  
-	            modelo.addRow(new Object[] {  
-	                ConectaPGSQL.retorna_obj_ConectaPGSQL().resultsql.getString("pess_codigo"),  
-	                ConectaPGSQL.retorna_obj_ConectaPGSQL().resultsql.getString("pess_nome"),  
-	                ConectaPGSQL.retorna_obj_ConectaPGSQL().resultsql.getString("pess_endereco"),  
-	                ConectaPGSQL.retorna_obj_ConectaPGSQL().resultsql.getString("pess_cidade"),  
-	                ConectaPGSQL.retorna_obj_ConectaPGSQL().resultsql.getString("pess_bairro")  
+		table.getColumnModel().getColumn(11).setPreferredWidth(40);  	  
+	        
+	     pst = con.prepareStatement(sql);      
+		       
+	  	  DefaultTableModel modelo = (DefaultTableModel)table.getModel();  
+	       modelo.setNumRows(0);  
+		    
+	    	while(rs.next()) {  
+	 
+	    		   modelo.addRow(new Object[] {  
+	                rs.getString("pess_codigo"),  
+	                rs.getString("pess_nome"),  
+	                rs.getString("pess_endereco"),  
+	                rs.getString("pess_cidade"),  
+	                rs.getString("pess_bairro")  
 	  
 	            });  
 	        }  
@@ -132,5 +129,7 @@ public class AcompanhaChamdo extends JFrame {
 	        JOptionPane.showMessageDialog(null,"Erro ao listar no JTable "+erro);  
 	  
 	    }  
-	}  
+	}
+	
+	
 }

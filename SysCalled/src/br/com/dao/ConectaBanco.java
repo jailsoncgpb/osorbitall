@@ -2,14 +2,12 @@ package br.com.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
-
 import javax.swing.JOptionPane;
 
 public class ConectaBanco {
 	
 	
-	public static Connection conectabd() throws ClassNotFoundException{
+	public static Connection conectabd(){
 		   
 		   try{
 			
@@ -19,7 +17,7 @@ public class ConectaBanco {
 			return con;
 		   }
 		   
-		   catch(SQLException error){
+		   catch(Exception error){
 			   
 			   JOptionPane.showMessageDialog(null, error);
 			   return null;
