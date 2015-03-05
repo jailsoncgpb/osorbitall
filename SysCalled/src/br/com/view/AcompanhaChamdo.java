@@ -1,135 +1,159 @@
 package br.com.view;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
 
-import br.com.dao.ConectaBanco;
-//import br.com.dao.ConexaoDao;
+import br.com.dao.ConexaoDao;
 
 
 public class AcompanhaChamdo extends JFrame {
 
-	private JPanel contentPane;
+	private static final long serialVersionUID = -1230438525737825081L;
 	private JTable table;
-	
-	  Connection con = null;
-	  PreparedStatement pst = null;
-	  ResultSet rs =null;
-	  
-	  
+	private JButton btnChamadosAberto;
+	private JButton btnEmAndamento;
+	private JButton btnPendenteDeTerceiros;
+	private JLabel lblResultadoDaBusca;
+	private JButton btnTodos;
+	private JPanel contentPane;
+    private Vector<String> cabecalho = new Vector<String>();
+    private Vector<Vector> linhas = new Vector<Vector>();
+    private int consulta = 0;
 
-	/**
-	 * Create the frame.
-	 * @throws ClassNotFoundException 
-	 */
-	
-	public AcompanhaChamdo () throws ClassNotFoundException {
-		
-		con = ConectaBanco.conectabd();
-		
-		setTitle("SysCalled > Acompanhamento dos Chamados");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 748, 478);
-		contentPane = new JPanel();
+    
+	  public static void main(String args[]) throws ClassNotFoundException	  {
+	    JFrame janela = new AcompanhaChamdo();
+	    janela.setUndecorated(true);
+	    janela.getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
+	    janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+	    janela.setVisible(true);
+	  }
+	  
+	  public AcompanhaChamdo() throws ClassNotFoundException  {   
+		  
+		  
+	    setTitle( "SysCalled > Acompanhamento dos Chamados" );
+	    setBounds(100,100,450, 300);
+	    contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
-		JButton btnChamadosAberto = new JButton("Chamados Aberto");
-		btnChamadosAberto.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {			
-				
-				geraTabela();		
-				
-		  }		
+	    
+	    btnChamadosAberto = new JButton("Chamados Aberto");
+	    btnChamadosAberto.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				consulta = 1;
+				if (!ConexaoDao.getConnection())  {
+					JOptionPane.showMessageDialog(null, "Falha na conexão, o sistema será fechado!");
+					System.exit(0);
+				}else{
+				    geraTabela();
+				    JFrame janela;
+					try {
+						janela = new AcompanhaChamdo();
+					    janela.setVisible(true);
+	                    dispose();
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					}
+				}
+			}
 		});
-		
-		
 		btnChamadosAberto.setBounds(124, 28, 119, 51);
 		contentPane.add(btnChamadosAberto);
-		
-		JButton btnEmAndamento = new JButton("Em Andamento");
+	
+		btnEmAndamento = new JButton("Em Andamento");
 		btnEmAndamento.setBounds(253, 28, 105, 51);
 		contentPane.add(btnEmAndamento);
 		
-		JButton btnPendenteDeTerceiros = new JButton("Pendente de Terceiros");
+		btnPendenteDeTerceiros = new JButton("Pendente de Terceiros");
 		btnPendenteDeTerceiros.setBounds(368, 29, 141, 50);
 		contentPane.add(btnPendenteDeTerceiros);
 		
-		JLabel lblResultadoDaBusca = new JLabel("Resultado da Busca");
+		lblResultadoDaBusca = new JLabel("Resultado da Busca");
 		lblResultadoDaBusca.setBounds(23, 114, 105, 20);
 		contentPane.add(lblResultadoDaBusca);
 		
-		JButton btnTodos = new JButton("Todos");
-		btnTodos.setBounds(519, 28, 94, 50);
+		btnTodos = new JButton("Todos");
+		btnTodos.setBounds(519, 29, 94, 50);
 		contentPane.add(btnTodos);
 		
-		table = new JTable();
-		table.setBounds(23, 146, 688, 251);
-		contentPane.add(table);
-	}
-	
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(21, 240, 403, 290);
+		contentPane.add(scrollPane);
+		
+		
+	    if (!ConexaoDao.getConnection())
+	    {
+	      JOptionPane.showMessageDialog(null, "Falha na conexão, o sistema será fechado!");
+	      System.exit(0);
+	    }
 
-	public void geraTabela() {
-		
-		String sql = "select Setor_Chamado,Posicao_Pa_chamado,Hora_Chamado,Status_Chamdo,Solicitante_Chamado from tbchamados where Status_Chamdo = 'ABERTO'" ;
-		
-	try {
-			
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); //mantem o tamanho das colunas  
-		//table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); desabilita a seleção multipla  
-		table.setModel(new DefaultTableModel( 
+		table = new JTable();
+	    
+       	geraTabela();
+ 
+       	table = new JTable(linhas,cabecalho);
+    	JScrollPane scroller = new JScrollPane( table );
+    	scrollPane.setViewportView(scroller);
+       
+        
+	  }
+
+	  private void geraTabela(){
+			try{
+				cabecalho = new Vector<String>();
+				linhas = new Vector<Vector>();
 				
-	            new Object [][]{},  
-	            new String[] {"Setor Chamado","Posicao Pa","Hora Chamado","Status Chamdo","Solicitante Chamado" }));  
-	  
-		table.getColumnModel().getColumn(0).setPreferredWidth(80);  
-		table.getColumnModel().getColumn(1).setPreferredWidth(270);  
-		table.getColumnModel().getColumn(2).setPreferredWidth(270);  
-		table.getColumnModel().getColumn(3).setPreferredWidth(150);  
-		table.getColumnModel().getColumn(4).setPreferredWidth(150);  
-		table.getColumnModel().getColumn(5).setPreferredWidth(100);  
-		table.getColumnModel().getColumn(6).setPreferredWidth(100);  
-		table.getColumnModel().getColumn(7).setPreferredWidth(300);		  
-		table.getColumnModel().getColumn(9).setPreferredWidth(90);  
-		table.getColumnModel().getColumn(10).setPreferredWidth(75);  
-		table.getColumnModel().getColumn(11).setPreferredWidth(40);  	  
-	        
-	     pst = con.prepareStatement(sql);      
-		       
-	  	  DefaultTableModel modelo = (DefaultTableModel)table.getModel();  
-	       modelo.setNumRows(0);  
+				System.out.println("consulta: "+consulta);
 		    
-	    	while(rs.next()) {  
-	 
-	    		   modelo.addRow(new Object[] {  
-	                rs.getString("pess_codigo"),  
-	                rs.getString("pess_nome"),  
-	                rs.getString("pess_endereco"),  
-	                rs.getString("pess_cidade"),  
-	                rs.getString("pess_bairro")  
-	  
-	            });  
-	        }  
-	    }  
-	    catch(SQLException erro){  
-	        JOptionPane.showMessageDialog(null,"Erro ao listar no JTable "+erro);  
-	  
-	    }  
-	}
-	
-	
+				if(consulta == 0){
+					ConexaoDao.setResultSet("select * from tbchamados");
+				}else if(consulta == 1){
+					ConexaoDao.setResultSet("select * from tbchamados where idLogChamado = "+2);
+				}
+				
+				ConexaoDao.resultSet.next();  
+				ResultSetMetaData rsmd = ConexaoDao.resultSet.getMetaData();
+				for ( int i = 1; i <= rsmd.getColumnCount(); ++i ) 
+					cabecalho.addElement( rsmd.getColumnName( i ) );
+					do {
+						Vector<Object> linhaAtual = new Vector<Object>();
+						for ( int i = 1; i <= rsmd.getColumnCount(); i++ ){
+							switch( rsmd.getColumnType(i)){
+								case Types.VARCHAR:
+									linhaAtual.addElement(ConexaoDao.resultSet.getString(i));break;
+								case Types.TIMESTAMP:
+									linhaAtual.addElement(ConexaoDao.resultSet.getDate(i));break;
+								case Types.INTEGER:
+									linhaAtual.addElement(ConexaoDao.resultSet.getInt(i));break;
+								case Types.DATE:
+									linhaAtual.addElement(ConexaoDao.resultSet.getDate(i));break;
+								case Types.DECIMAL:
+									linhaAtual.addElement(ConexaoDao.resultSet.getDouble(i));break;
+							}
+						}
+						linhas.addElement(linhaAtual);     
+					} 
+					while ( ConexaoDao.resultSet.next() );       
+						table = new JTable( linhas, cabecalho );
+						JScrollPane scroller = new JScrollPane( table );
+						getContentPane().add(scroller, BorderLayout.CENTER);
+					}catch (SQLException erro) { }
+				} 
 }

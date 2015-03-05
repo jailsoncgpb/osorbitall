@@ -2,29 +2,30 @@ package br.com.view;
 
 import java.awt.EventQueue;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
+
+import java.awt.Color;
+
+import javax.swing.border.BevelBorder;
+import javax.swing.JButton;
+import javax.swing.JTabbedPane;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.Color;
 
+import br.com.view.*;
 
-public class Principal extends JFrame {
+public class Principal {
 
-	private JPanel contentPane;
-
-	/**
-	 * Launch the application.
-	 */
+	private JFrame frmSyscalledOrbitall;
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Principal frame = new Principal();
-					frame.setVisible(true);
+					Principal window = new Principal();
+					window.frmSyscalledOrbitall.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -33,46 +34,64 @@ public class Principal extends JFrame {
 	}
 
 	/**
-	 * Create the frame.
+	 * Create the application.
 	 * @throws ClassNotFoundException 
 	 */
 	public Principal() throws ClassNotFoundException {
+		initialize();
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
 		
-		AbrirChamado frmAbrirChamado = new AbrirChamado();
-		AcompanhaChamdo AcompanhaChamdo = new AcompanhaChamdo();
+		frmSyscalledOrbitall = new JFrame();
+		frmSyscalledOrbitall.setTitle("SysCalled > Orbitall");
+		frmSyscalledOrbitall.setBounds(100, 100, 450, 300);
+		frmSyscalledOrbitall.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmSyscalledOrbitall.getContentPane().setLayout(null);
 		
+		JPanel panel = new JPanel();
+		panel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		panel.setBackground(Color.LIGHT_GRAY);
+		panel.setBounds(10, 11, 414, 239);
+		frmSyscalledOrbitall.getContentPane().add(panel);
+		panel.setLayout(null);
 		
-		setTitle("SysCalled > Orbitall");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 458, 300);
-		contentPane = new JPanel();
-		contentPane.setBackground(new Color(30, 144, 255));
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(null);
-		
-		frmAbrirChamado.setLocationRelativeTo(null);
-		
-		JButton btnNovoChamado = new JButton("Novo Chamado");
+		JButton btnNovoChamado = new JButton("Novo chamado");
 		btnNovoChamado.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-				frmAbrirChamado.setVisible(true);
-				
+			public void actionPerformed(ActionEvent arg0) {
+				AbrirChamado frmAbrirChamado;
+				try {
+					frmAbrirChamado = new AbrirChamado();
+					frmAbrirChamado.setVisible(true);
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
 				
 			}
 		});
-		btnNovoChamado.setBounds(10, 36, 131, 41);
-		contentPane.add(btnNovoChamado);
+		btnNovoChamado.setMnemonic('N');
+		btnNovoChamado.setToolTipText("");
+		btnNovoChamado.setBounds(67, 108, 120, 40);
+		panel.add(btnNovoChamado);
 		
 		JButton btnAcompanharChamado = new JButton("Acompanhar Chamado");
 		btnAcompanharChamado.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				AcompanhaChamdo frmAcompanhaChamdo;
+				try {
+					frmAcompanhaChamdo = new AcompanhaChamdo();
+					frmAcompanhaChamdo.setVisible(true);
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
 				
-				AcompanhaChamdo.setVisible(true);
 			}
 		});
-		btnAcompanharChamado.setBounds(260, 36, 172, 41);
-		contentPane.add(btnAcompanharChamado);
+		btnAcompanharChamado.setMnemonic('A');
+		btnAcompanharChamado.setBounds(225, 108, 150, 40);
+		panel.add(btnAcompanharChamado);
 	}
 }

@@ -21,7 +21,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import br.com.dao.ConectaBanco;
+
 import br.com.dao.ConexaoDao;
 import br.com.model.Campos;
 
@@ -50,14 +50,13 @@ public class AbrirChamado extends JFrame {
 	 * Create the frame.
 	 * @throws ClassNotFoundException 
 	 */
-	  
 	public AbrirChamado () throws ClassNotFoundException {
 		
-		con = ConectaBanco.conectabd();
+		
 		
 		setTitle("SysCalled - Abrir Chamado");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(-27, -30, 680, 477);
+		setBounds(27, 30, 680, 477);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -123,7 +122,7 @@ public class AbrirChamado extends JFrame {
 		lblSetor.setBounds(430, 83, 46, 14);
 		contentPane.add(lblSetor);
 		
-		JComboBox<String> comboSetor = new JComboBox<String>();
+		final JComboBox<String> comboSetor = new JComboBox<String>();
 		comboSetor.setModel(new DefaultComboBoxModel<String>(new String[] {"ORBITALL", "ORBITALL-BBS", "STEFANINI", "ADMINISTRATIVO", "TREINAMENTO"}));
 		comboSetor.setEditable(true);
 		comboSetor.setEnabled(false);
@@ -168,7 +167,7 @@ public class AbrirChamado extends JFrame {
 		lblDescrioDoProblema.setBounds(19, 214, 143, 14);
 		contentPane.add(lblDescrioDoProblema);
 		
-		JTextArea textArea = new JTextArea();
+		final JTextArea textArea = new JTextArea();
 		textArea.setEnabled(false);
 		textArea.setBounds(29, 239, 600, 101);
 		contentPane.add(textArea);
@@ -233,7 +232,7 @@ public class AbrirChamado extends JFrame {
 		btnEnviar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
-		String sql = "INSERT INTO tbchamados (Data_Chamado, Hora_Chamado,Numero_Chamado, Status_Chamdo, Solicitante_Chamdo, Setor_Chamado, Ramal_Chamado, Host_Chamado, UsuarioA_Chamado,	Descricao_Chamado) values (?,?,?,?,?,?,?,?,?,?)";
+		String sql = "INSERT INTO tbchamados (Data_Chamado, Hora_Chamado,Numero_Chamado, Status_Chamado, Solicitante_Chamado, Setor_Chamado, Ramal_Chamado, Host_Chamado, Usuario_Chamado,	Descricao_Chamado) values (?,?,?,?,?,?,?,?,?,?)";
 				
 				try{
 				
